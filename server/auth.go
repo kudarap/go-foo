@@ -6,16 +6,14 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-
-	"github.com/gorilla/mux"
 )
 
 // authentication is middleware that looks for authorization bearer token
 // from header request and process verification. Verified token provides authorized
-// user id and adds to request context that can be use for validating authorized requests.
+// user id and adds to request context that can be used for validating authorized requests.
 //
 // When authorization header is not present it skips the verification.
-func authentication(auth authenticator) mux.MiddlewareFunc {
+func authentication(auth authenticator) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			token, err := availableTokenFromHeader(r.Header)

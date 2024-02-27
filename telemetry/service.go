@@ -2,22 +2,26 @@ package telemetry
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/kudarap/foo"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 )
 
+const serviceName = "fooservice"
+
 type FooService struct {
 	*foo.Service
+	logger     *slog.Logger
 	tracerName string
 }
 
 func (s *FooService) FighterByID(ctx context.Context, id string) (*foo.Fighter, error) {
 	ctx, span := otel.Tracer(s.tracerName).Start(ctx, "fooservice.FighterByID")
 	defer span.End()
-	span.SetAttributes(attribute.String("id", id))
+
+	s.logger.InfoContext(ctx, "params", "fighter_id", id)
 
 	f, err := s.Service.FighterByID(ctx, id)
 	if err != nil {
@@ -26,9 +30,10 @@ func (s *FooService) FighterByID(ctx context.Context, id string) (*foo.Fighter, 
 		return nil, err
 	}
 
+	s.logger.InfoContext(ctx, "returns", "fighter", f)
 	return f, nil
 }
 
-func TraceFooService(s *foo.Service) *FooService {
-	return &FooService{s, "foo-service"}
+func TraceFooService(s *foo.Service, l *slog.Logger) *FooService {
+	return &FooService{s, l, serviceName}
 }

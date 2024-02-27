@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 )
 
 // Server represents application server.
@@ -65,7 +65,7 @@ func New(
 
 // Routes setups middlewares and route endpoints.
 func (s *Server) Routes() http.Handler {
-	r := mux.NewRouter()
+	r := chi.NewRouter()
 	r.Use(
 		s.tracing.Middleware(),
 		authentication(s.authenticator),
@@ -75,16 +75,17 @@ func (s *Server) Routes() http.Handler {
 	)
 
 	// Public endpoints
-	r.HandleFunc("/version", GetVersion(s.Version)).Methods(http.MethodGet)
-	r.HandleFunc("/healthcheck", Healthcheck(s.databaseChecker)).Methods(http.MethodGet)
-	r.HandleFunc("/fighters/{id}", GetFighterByID(s.service)).Methods(http.MethodGet)
-	r.NotFoundHandler = s.noMatchHandler(http.StatusNotFound)
-	r.MethodNotAllowedHandler = s.noMatchHandler(http.StatusMethodNotAllowed)
+	r.Get("/version", GetVersion(s.Version))
+	r.Get("/healthcheck", Healthcheck(s.databaseChecker))
+	r.Get("/fighters/{id}", GetFighterByID(s.service))
+	//r.NotFoundHandler = s.noMatchHandler(http.StatusNotFound)
+	//r.MethodNotAllowedHandler = s.noMatchHandler(http.StatusMethodNotAllowed)
 
 	// Private endpoints
-	pr := r.PathPrefix("/").Subrouter()
-	//pr.Use(authorizedMiddleware)
-	pr.HandleFunc("/fighters", ListFighters(s.service)).Methods(http.MethodGet)
+	r.Route("/", func(r chi.Router) {
+		//pr.Use(authorizedMiddleware)
+		r.Get("/fighters", ListFighters(s.service))
+	})
 	return r
 }
 

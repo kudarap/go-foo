@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	"github.com/kudarap/foo"
 )
 
@@ -14,8 +14,8 @@ type service interface {
 
 func GetFighterByID(s service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		v := mux.Vars(r)
-		c, err := s.FighterByID(r.Context(), v["id"])
+		id := chi.URLParam(r, "id")
+		c, err := s.FighterByID(r.Context(), id)
 		if err != nil {
 			encodeJSONError(w, err, http.StatusBadRequest)
 			return

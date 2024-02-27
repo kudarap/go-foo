@@ -48,7 +48,7 @@ func (a *App) Setup() error {
 	}
 
 	svc := foo.NewService(postgresClient, a.logger)
-	service := telemetry.TraceFooService(svc)
+	service := telemetry.TraceFooService(svc, a.logger)
 
 	tsi := telemetry.NewServerInstrumentation(a.config.Telemetry.ServiceName)
 	a.server = server.New(a.config.Server, service, fakeAuth, postgresClient, tsi, a.version, a.logger)
