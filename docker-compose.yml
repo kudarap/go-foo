@@ -2,14 +2,15 @@ version: '3'
 
 services:
   postgres:
-    image: postgres:15.4
+    image: postgres:16.2
     ports:
-      - 5433:5432
+      - "5433:5432"
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: user
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
 
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.85.0
+    image: otel/opentelemetry-collector-contrib:0.95.0
     ports:
-      - 4317:4317
+      - "4317:4317"

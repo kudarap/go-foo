@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"time"
 
-	otellogs "github.com/dbdoyc/opentelemetry-logs-go"
-	"github.com/dbdoyc/opentelemetry-logs-go/logs"
+	otellogs "github.com/kudarap/opentelemetry-logs-go"
+	"github.com/kudarap/opentelemetry-logs-go/logs"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/sdk/instrumentation"
 	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
