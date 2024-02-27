@@ -6,11 +6,11 @@ golang backend service scaffold
 - [x] worker for background processing or consumers
 - [x] telemetry
 - [x] automatic database migration
-- [x] env config override
+- [x] config file with env var override
 - [x] unit tests
 
 ### Requirements
-- go 1.21
+- go 1.22
 - docker 24
 
 ### Setup
