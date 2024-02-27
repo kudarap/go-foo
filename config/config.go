@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 
+	"github.com/kudarap/foo/logging"
 	"github.com/kudarap/foo/postgres"
 	"github.com/kudarap/foo/server"
 	"github.com/kudarap/foo/telemetry"
@@ -16,6 +17,7 @@ const DefaultFile = ".env"
 type Config struct {
 	Server                       server.Config
 	WorkerQueueSize              int
+	Logging                      logging.Config
 	Telemetry                    telemetry.Config
 	GoogleApplicationCredentials string
 	Postgres                     postgres.Config
@@ -37,6 +39,9 @@ func Load(file string) (*Config, error) {
 			WriteTimeout: viper.GetDuration("SERVER_WRITE_TIMEOUT"),
 		},
 		WorkerQueueSize: viper.GetInt("WORKER_QUEUE_SIZE"),
+		Logging: logging.Config{
+			Level: viper.GetString("LOGGING_LEVEL"),
+		},
 		Telemetry: telemetry.Config{
 			Enabled:      viper.GetBool("TELEMETRY_ENABLED"),
 			CollectorURL: viper.GetString("TELEMETRY_COLLECTOR_URL"),

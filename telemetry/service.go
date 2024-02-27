@@ -21,7 +21,7 @@ func (s *FooService) FighterByID(ctx context.Context, id string) (*foo.Fighter, 
 	ctx, span := otel.Tracer(s.tracerName).Start(ctx, "fooservice.FighterByID")
 	defer span.End()
 
-	s.logger.InfoContext(ctx, "params", "fighter_id", id)
+	s.logger.DebugContext(ctx, "params", "fighter_id", id)
 
 	f, err := s.Service.FighterByID(ctx, id)
 	if err != nil {
@@ -30,7 +30,7 @@ func (s *FooService) FighterByID(ctx context.Context, id string) (*foo.Fighter, 
 		return nil, err
 	}
 
-	s.logger.InfoContext(ctx, "returns", "fighter", f)
+	s.logger.DebugContext(ctx, "returns", "fighter", f)
 	return f, nil
 }
 

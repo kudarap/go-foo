@@ -82,7 +82,7 @@ func (a *App) Run(mode string) error {
 }
 
 func main() {
-	log := logging.New()
+	log := logging.Default()
 
 	mode, err := appMode()
 	if err != nil {
@@ -91,15 +91,22 @@ func main() {
 	}
 
 	log.Info("app: loading config...")
-	c, err := config.LoadDefault()
+	conf, err := config.LoadDefault()
 	if err != nil {
 		log.Error("could not load config", "err", err)
 		return
 	}
 
+	log.Info(fmt.Sprintf("log level set to %s", strings.ToUpper(conf.Logging.Level)))
+	log, err = logging.New(conf.Logging)
+	if err != nil {
+		log.Error("could not create logging", "err", err)
+		return
+	}
+
 	version := buildVer()
-	log.Info(fmt.Sprintf("telemetry enabled:%v url:%s", c.Telemetry.Enabled, c.Telemetry.CollectorURL))
-	shutdown, err := telemetry.InitProvider(c.Telemetry, mode, version.Tag)
+	log.Info(fmt.Sprintf("telemetry enabled:%v url:%s", conf.Telemetry.Enabled, conf.Telemetry.CollectorURL))
+	shutdown, err := telemetry.InitProvider(conf.Telemetry, mode, version.Tag)
 	if err != nil {
 		log.Error("could not init telemetry provider", "err", err)
 		return
@@ -111,7 +118,7 @@ func main() {
 	}()
 	log = telemetry.TraceLogger(log)
 
-	app := &App{config: c, logger: log, version: version}
+	app := &App{config: conf, logger: log, version: version}
 	if err = app.Setup(); err != nil {
 		log.Error("could not setup app", "err", err)
 		return
