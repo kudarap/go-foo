@@ -21,12 +21,10 @@ func encodeJSONResp(w http.ResponseWriter, data interface{}, code int) {
 
 func encodeJSONError(w http.ResponseWriter, err error, statusCode int) {
 	m := struct {
-		Error  string `json:"error"`
-		Code   string `json:"code,omitempty"`
-		Status int    `json:"status"`
+		Error string `json:"error"`
+		Code  string `json:"code,omitempty"`
 	}{}
 	m.Error = err.Error()
-	m.Status = statusCode
 
 	// Custom error encoding for xerror.
 	var errX xerror.XError
