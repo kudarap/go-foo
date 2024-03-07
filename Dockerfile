@@ -1,4 +1,4 @@
-FROM golang:1.21-alpine3.18 AS builder
+FROM golang:1.22-alpine3.19 AS builder
 RUN apk add git make
 
 WORKDIR /src
@@ -10,7 +10,7 @@ RUN go mod download
 COPY . .
 RUN make build
 
-FROM alpine:3.18
+FROM alpine:3.19
 RUN apk add --no-cache ca-certificates
 RUN update-ca-certificates
 COPY --from=builder /src/foosvc /usr/local/bin/app
