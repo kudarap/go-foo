@@ -4,9 +4,10 @@ go 1.22
 
 require (
 	github.com/go-chi/chi/v5 v5.0.12
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/golang-migrate/migrate/v4 v4.17.0
 	github.com/google/uuid v1.6.0
-	github.com/jackc/pgx/v5 v5.5.3
+	github.com/jackc/pgx/v5 v5.5.4
 	github.com/kudarap/opentelemetry-logs-go v0.3.1
 	github.com/spf13/viper v1.18.2
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0
@@ -16,7 +17,7 @@ require (
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.24.0
 	go.opentelemetry.io/otel/sdk v1.24.0
 	go.opentelemetry.io/otel/trace v1.24.0
-	google.golang.org/grpc v1.62.0
+	google.golang.org/grpc v1.62.1
 )
 
 require (

@@ -14,8 +14,7 @@ import (
 
 	"github.com/kudarap/foo"
 	"github.com/kudarap/foo/config"
-	"github.com/kudarap/foo/fakeauthenticator"
-	"github.com/kudarap/foo/fakeproducer"
+	"github.com/kudarap/foo/fakejob"
 	"github.com/kudarap/foo/logging"
 	"github.com/kudarap/foo/postgres"
 	"github.com/kudarap/foo/server"
@@ -42,19 +41,16 @@ func (a *App) Setup() error {
 	if err != nil {
 		return fmt.Errorf("could not setup postgres: %s", err)
 	}
-	fakeAuth, err := fakeauthenticator.NewClient(a.config.GoogleApplicationCredentials)
-	if err != nil {
-		return fmt.Errorf("could not setup firebase: %s", err)
-	}
 
 	svc := foo.NewService(postgresClient, a.logger)
 	service := telemetry.TraceFooService(svc, a.logger)
 
+	auth := &server.JWTAuth{NoVerify: true}
 	tsi := telemetry.NewServerInstrumentation(a.config.Telemetry.ServiceName)
-	a.server = server.New(a.config.Server, service, fakeAuth, postgresClient, tsi, a.version, a.logger)
+	a.server = server.New(a.config.Server, service, auth, postgresClient, tsi, a.version, a.logger)
 
-	fp := fakeproducer.New(time.Second)
-	a.worker = worker.New(fp, a.config.WorkerQueueSize, a.logger)
+	fj := fakejob.New(time.Second)
+	a.worker = worker.New(fj, a.config.WorkerQueueSize, a.logger)
 	a.worker.Use(worker.LoggingMiddleware(a.logger), telemetry.TraceWorker)
 	a.worker.HandleFunc("demo", worker.FakeFighterConsumer(a.logger))
 

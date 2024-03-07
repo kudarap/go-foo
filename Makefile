@@ -22,3 +22,6 @@ run-worker: build
 
 build:
 	CGO_ENABLED=0 go build -v -ldflags=$(LDFLAGS) ./cmd/$(APPNAME)
+
+local-dbs:
+	docker run --rm --name foo-postgres -d -e POSTGRES_USER=user -e POSTGRES_PASSWORD=pass -p 5432:5432 postgres:16.2

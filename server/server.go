@@ -15,14 +15,14 @@ import (
 // Server represents application server.
 type Server struct {
 	*http.Server
-	config Config
 
 	service         service
 	authenticator   authenticator
-	databaseChecker databasePinger
+	databaseChecker databaseChecker
+	tracing         tracing
+	logger          *slog.Logger
 
-	tracing tracing
-	logger  *slog.Logger
+	config  Config
 	Version Version
 }
 
@@ -31,7 +31,7 @@ func New(
 	config Config,
 	service service,
 	authenticator authenticator,
-	databaseChecker databasePinger,
+	databaseChecker databaseChecker,
 	tracing tracing,
 	version Version,
 	logger *slog.Logger,
@@ -68,7 +68,6 @@ func (s *Server) Routes() http.Handler {
 	r := chi.NewRouter()
 	r.Use(
 		s.tracing.Middleware(),
-		authentication(s.authenticator),
 		requestIDMiddleware,
 		s.loggingMiddleware,
 		s.recoveryMiddleware,
@@ -76,16 +75,17 @@ func (s *Server) Routes() http.Handler {
 
 	// Public endpoints
 	r.Get("/version", GetVersion(s.Version))
-	r.Get("/healthcheck", Healthcheck(s.databaseChecker))
+	r.Get("/healthcheck", HealthCheck(s.databaseChecker))
 	r.Get("/fighters/{id}", GetFighterByID(s.service))
-	//r.NotFoundHandler = s.noMatchHandler(http.StatusNotFound)
-	//r.MethodNotAllowedHandler = s.noMatchHandler(http.StatusMethodNotAllowed)
 
 	// Private endpoints
 	r.Route("/", func(r chi.Router) {
-		//pr.Use(authorizedMiddleware)
+		r.Use(authMiddleware(s.authenticator))
 		r.Get("/fighters", ListFighters(s.service))
 	})
+
+	r.NotFound(noMatchHandler(http.StatusNotFound))
+	r.MethodNotAllowed(noMatchHandler(http.StatusMethodNotAllowed))
 	return r
 }
 
@@ -117,14 +117,11 @@ func (s *Server) Run() error {
 	return nil
 }
 
-// noMatchHandler handler with logging middlewares since these handlers not being hit
-// on router middleware chain and must be instrumented separately.
-func (s *Server) noMatchHandler(status int) http.Handler {
-	h := func(w http.ResponseWriter, r *http.Request) {
+func noMatchHandler(status int) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		e := errors.New(http.StatusText(status))
 		encodeJSONError(w, e, status)
 	}
-	return requestIDMiddleware(s.loggingMiddleware(http.HandlerFunc(h)))
 }
 
 type tracing interface {

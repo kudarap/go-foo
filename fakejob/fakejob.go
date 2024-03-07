@@ -1,4 +1,4 @@
-package fakeproducer
+package fakejob
 
 import (
 	"fmt"

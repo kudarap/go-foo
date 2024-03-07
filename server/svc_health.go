@@ -9,7 +9,7 @@ type Health struct {
 	PostgresPing string `json:"postgres_ping"`
 }
 
-func Healthcheck(dp databasePinger) http.HandlerFunc {
+func HealthCheck(dp databaseChecker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		h := Health{
 			PostgresPing: "ok",
@@ -21,6 +21,6 @@ func Healthcheck(dp databasePinger) http.HandlerFunc {
 	}
 }
 
-type databasePinger interface {
+type databaseChecker interface {
 	Ping() (ok bool, err error)
 }

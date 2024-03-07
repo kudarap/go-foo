@@ -13,7 +13,7 @@ import (
 func TestHealthcheck(t *testing.T) {
 	tests := []struct {
 		name     string
-		dc       databasePinger
+		dc       databaseChecker
 		want     Health
 		wantCode int
 	}{
@@ -38,7 +38,7 @@ func TestHealthcheck(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, "http://localhost/healthcheck", nil)
 			w := httptest.NewRecorder()
-			Healthcheck(tt.dc).ServeHTTP(w, req)
+			HealthCheck(tt.dc).ServeHTTP(w, req)
 			resp := w.Result()
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
@@ -51,10 +51,10 @@ func TestHealthcheck(t *testing.T) {
 			}
 
 			if resp.StatusCode != tt.wantCode {
-				t.Errorf("Healthcheck() status = %d, want %d", resp.StatusCode, tt.wantCode)
+				t.Errorf("HealthCheck() status = %d, want %d", resp.StatusCode, tt.wantCode)
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Healthcheck() body = %s, want %v", body, tt.want)
+				t.Errorf("HealthCheck() body = %s, want %v", body, tt.want)
 			}
 		})
 	}
