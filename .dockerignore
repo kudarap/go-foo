@@ -1,3 +1,8 @@
 # editor
 .idea
 .vscode
+
+# project files
+/.env
+/foosvc
+.localdata
